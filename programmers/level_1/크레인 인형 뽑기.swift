@@ -1,52 +1,41 @@
 import Foundation
 
-struct Stack {
-    private var array = [Int]()
-    
-    var count: Int { return array.count }
-    var isEmtpy: Bool { return array.isEmpty }
-    var top: Int? { return array.last }
-    
-    mutating func push(_ element: Int) {
-        self.array.append(element)
-    }
-    
-    mutating func pop() -> Int? {
-        return self.array.popLast()
-    }
-}
-
-var boards = Array(repeating: Stack(), count: 31)
-var bucket = Stack()
-
 func solution(_ board:[[Int]], _ moves:[Int]) -> Int {
-    var result = 0
+    var board = board
+    var count = 0
+    var stack = [Int]()
 
-    parseBoard(board)
     for move in moves {
-        guard let doll = boards[move].pop() else { continue }
+        let doll = pickUpDoll(&board, move - 1)
         
-        if let topOfBucket = bucket.top, topOfBucket == doll {
-            let _ = bucket.pop()
-            result += 2
-            continue
+        if (doll == 0 ) { continue }
+        
+        if (stack.isEmpty) {
+            stack.append(doll)
+        } else {
+            let top = stack.last!
+            
+            if (top == doll) {
+                stack.removeLast()
+                count += 2
+            } else {
+                stack.append(doll)
+            }
         }
-        
-        bucket.push(doll)
     }
-    return result
-}
     
+    return count
+}
 
-func parseBoard(_ board:[[Int]]) {
-    for i in stride(from: board.count - 1, through: 0, by: -1) {
-        for j in 0..<board[i].count {
-            let boardNum = j + 1
-            let doll = board[i][j]
-
-            if (doll > 0) {
-                boards[boardNum].push(doll)
-            } 
+func pickUpDoll(_ board: inout [[Int]], _ row: Int) -> Int {
+    for i in 0..<board.count {
+        if (board[i][row] != 0) {
+            let doll = board[i][row]
+            
+            board[i][row] = 0
+            return doll 
         }
     }
+    
+    return 0
 }
