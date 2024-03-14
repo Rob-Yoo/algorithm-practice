@@ -1,19 +1,23 @@
 import Foundation
 
-typealias Position = (x: Int, y: Int, distance: Int)
+typealias Position = (x: Int, y: Int)
+typealias Path = (pos: Position, object: String, time: Int)
 
-struct Queue<T> {
-    var array = [T?]()
+var startPath = (pos: (x: 0, y: 0), object: "S", time: 0)
+var leverPath = (pos: (x: 0, y: 0), object: "L", time: 0)
+
+struct Queue {
+    var array = [Path?]()
     var head = 0
     
     var count: Int { return array.count - head }
     var isEmpty: Bool { return count == 0 }
     
-    mutating func enqueue(_ element: T) {
-        array.append(element)
+    mutating func enqueue(_ element: Path) {
+        self.array.append(element)
     }
     
-    mutating func dequeue() -> T? {
+    mutating func dequeue() -> Path? {
         guard !isEmpty, let element = array[head] else { return nil }
         
         array[head] = nil
@@ -28,61 +32,65 @@ struct Queue<T> {
     }
 }
 
+
 func solution(_ maps:[String]) -> Int {
     let maps = maps.map { $0.map { String($0) } }
-    var startPosition = (x: 0, y: 0, distance: 0)
-    var leverPosition = (x: 0, y: 0, distance: 0)
-    var path1: Int
-    var path2: Int
+    let minPathToLever: Int
+    let minPathToExit: Int
     
-    findStartAndLeverPosition(maps, &startPosition, &leverPosition)
-    path1 = findMinDistance(startPosition, "L", maps)
-    path2 = findMinDistance(leverPosition, "E", maps)
+    findStartAndLeverPosition(maps)
     
-    if (path1 == -1 || path2 == -1) {
-        return -1
-    }
+    minPathToLever = getMinPath(startPath, "L", maps)
+    if (minPathToLever == -1) { return -1 }
     
-    return path1 + path2
+    minPathToExit = getMinPath(leverPath, "E", maps)
+    if (minPathToExit == -1) { return -1 }
+    
+    return minPathToLever + minPathToExit
 }
 
-func findStartAndLeverPosition(_ maps: [[String]], _ startPosition: inout Position, _ leverPosition: inout Position) {
+
+func findStartAndLeverPosition(_ maps: [[String]]) {
     for i in 0..<maps.count {
-        for j in 0..<maps[0].count {
+        for j in 0..<maps[i].count {
             if (maps[i][j] == "S") {
-                startPosition = (x: j, y: i, distance: 0)
-            } else if (maps[i][j] == "L") {
-                leverPosition = (x: j, y: i, distance: 0)
+                startPath = (pos: (x: j, y:i), object: "S", time: 0)
+            }
+            
+            if (maps[i][j] == "L") {
+                leverPath = (pos: (x: j, y:i), object: "L", time: 0)
             }
         }
     }
 }
 
-func findMinDistance(_ start: Position, _ end: String, _ maps: [[String]]) -> Int {
-    var queue = Queue<Position>()
+func getMinPath(_ start: Path, _ end: String, _ maps: [[String]]) -> Int {
     var visited = Array(repeating: Array(repeating: false, count: maps[0].count), count: maps.count)
-    let dx = [1, -1, 0, 0]
-    let dy = [0, 0, 1, -1]
-
+    var queue = Queue()
+    let bound = (west: 0, north: 0, east: maps[0].count - 1, south: maps.count - 1)
+    
     queue.enqueue(start)
-    while (!queue.isEmpty) {
-        let object = queue.dequeue()!
+    while(!queue.isEmpty) {
+        let path = queue.dequeue()!
+        let dx = [0, 0, 1, -1]
+        let dy = [1, -1, 0, 0]
         
-        if (maps[object.y][object.x] == end) {
-            return object.distance
+        if (path.object == end) {
+            return path.time
         }
         
-        for (x, y) in zip(dx, dy) {
-            let nx = object.x + x
-            let ny = object.y + y
+        for i in 0..<4 {
+            let nx = path.pos.x + dx[i]
+            let ny = path.pos.y + dy[i]
             
-            if (0 <= nx && nx < maps[0].count && 0 <= ny && ny < maps.count && maps[ny][nx] != "X") {
-                if (!visited[ny][nx]) {
-                    let next = (x: nx, y: ny, distance: object.distance + 1)
-
-                    visited[ny][nx] = true
-                    queue.enqueue(next)
-                }
+            if (nx < bound.west || nx > bound.east || ny < bound.north || ny > bound.south) { continue }
+            if (maps[ny][nx] == "X") { continue }
+            
+            if(!visited[ny][nx]) {
+                let nextPath = (pos: (x: nx, y: ny), object: maps[ny][nx], time: path.time + 1)
+                
+                visited[ny][nx] = true
+                queue.enqueue(nextPath)
             }
         }
     }
