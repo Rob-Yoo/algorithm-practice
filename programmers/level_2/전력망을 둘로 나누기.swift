@@ -1,51 +1,47 @@
 import Foundation
 
-var tree = [[Int]]()
+var graph = Array(repeating: [Int](), count: 101)
 
 func solution(_ n:Int, _ wires:[[Int]]) -> Int {
     var result = Int.max
 
-    makeTree(n, wires)
+    makeGraph(wires)
     for wire in wires {
-        result = min(result, getResult(n, wire))
+        let numberOfTowers = splitWire(n, wire)
+        let numberOfOtherTowers = n - numberOfTowers
+        
+        result = min(result, abs(numberOfTowers - numberOfOtherTowers))
     }
+    
     return result
 }
 
-func makeTree(_ n: Int, _ wires: [[Int]]) {
-    tree = Array(repeating: [Int](), count: n + 1)
+func makeGraph(_ wires:[[Int]]) {
     for wire in wires {
-        let v1 = wire[0]
-        let v2 = wire[1]
+        let (v1, v2) = (wire[0], wire[1])
         
-        tree[v1].append(v2)
-        tree[v2].append(v1)
+        graph[v1].append(v2)
+        graph[v2].append(v1)
     }
 }
 
-func getResult(_ n: Int, _ removedWire: [Int]) -> Int {
-    let v1 = removedWire[0]
-    let v2 = removedWire[1]
-    let numberOfVertex = getNumberOfVertex(v1, v2, n)
-    
-    return abs((n - numberOfVertex) - numberOfVertex)
-}
-
-func getNumberOfVertex(_ v1: Int, _ v2: Int, _ n: Int) -> Int {
-    var numberOfVertex = 0
+func splitWire(_ n: Int, _ wire: [Int]) -> Int {
+    var count = 0
     var visited = Array(repeating: false, count: n + 1)
-
+    let (from, to) = (wire[0], wire[1])
+    
     func dfs(_ v: Int) {
         visited[v] = true
-        numberOfVertex += 1
+        count += 1
         
-        for vertex in tree[v] {
-            if (!visited[vertex] && vertex != v2) {
-                dfs(vertex)
+        for next in graph[v] {
+            if (!visited[next] && next != to) {
+                dfs(next)
             }
         }
     }
-    dfs(v1)
     
-    return numberOfVertex 
+    dfs(from)
+    
+    return count
 }
