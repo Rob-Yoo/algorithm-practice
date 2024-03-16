@@ -1,39 +1,69 @@
 import Foundation
 
-var graph = Array(repeating: Array(repeating: 500001, count: 51), count: 51)
+typealias Edge = (dest: Int, time: Int)
+
+var graph = Array(repeating: [Edge](), count: 51)
 
 func solution(_ N:Int, _ road:[[Int]], _ k:Int) -> Int {
-    var floydTable: [[Int]]
-
-    makeGraph(road)
-    floydTable = getFloydTable()
-
-    return floydTable[1].filter { $0 <= k }.count
-}
-
-func makeGraph(_ roads: [[Int]]) {
-    for i in 0..<graph.count {
-        graph[i][i] = 0
-    }
-
-    for road in roads {
-        let (from, to, time) = (road[0], road[1], road[2])
-        
-        graph[from][to] = min(graph[from][to], time)
-        graph[to][from] = graph[from][to]
-    } 
-}
-
-func getFloydTable() -> [[Int]] {
-    var floydTable = graph
+    var visited = [Int: Bool]()
+    var dijkstraTable = Array(repeating: Int.max, count: N + 1)
+    var pq = [Edge]()
     
-    for k in 1..<floydTable.count {
-        for i in 1..<floydTable.count {
-            for j in 1..<floydTable.count {
-                floydTable[i][j] = min(floydTable[i][j], floydTable[i][k] + floydTable[k][j])
+    makeGraph(road)
+    dijkstraTable[1] = 0
+    pq.enqueue((dest: 1, time: 0))
+    while(!pq.isEmpty) {
+        let road = pq.dequeue()!
+        let (current, deliveryTime) = (road.dest, road.time)
+        
+        if (visited[current, default: false]) { continue }
+        visited[current] = true
+        
+        for edge in graph[current] {
+            let (next, time) = (edge.dest, edge.time)
+            
+            if (dijkstraTable[next] > deliveryTime + time) {
+                dijkstraTable[next] = deliveryTime + time
+                pq.enqueue((dest: next, time: dijkstraTable[next]))
             }
         }
     }
     
-    return floydTable
+    return dijkstraTable.filter { $0 <= k }.count
+}
+
+func makeGraph(_ roads: [[Int]]) {
+    for road in roads {
+        let (from, to, time) = (road[0], road[1], road[2])
+        
+        graph[from].append((dest: to, time: time))
+        graph[to].append((dest: from, time: time))
+    }
+}
+
+extension Array where Element == Edge {
+    mutating func enqueue(_ element: Edge) {
+        if (self.isEmpty) {
+            self.append(element)
+        } else {
+            var left = 0
+            var right = self.count - 1
+            
+            while(left <= right) {
+                let mid = (left + right) / 2
+                
+                if (self[mid].time > element.time) {
+                    left = mid + 1
+                } else {
+                    right = mid - 1
+                }
+            }
+            
+            self.insert(element, at: left)
+        }
+    }
+    
+    mutating func dequeue() -> Edge? {
+        return self.popLast()
+    }
 }
