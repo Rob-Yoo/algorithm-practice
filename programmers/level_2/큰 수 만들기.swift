@@ -1,24 +1,32 @@
 import Foundation
 
 func solution(_ number:String, _ k:Int) -> String {
-    var number = number.map { String($0) }
+    var result = ""
     var k = k
-    var stack = ""
-    
-    for i in number.indices {
-        while (!stack.isEmpty && String(stack.last!) < number[i]) {
-            if (k > 0) {
-                stack.removeLast()
+
+    for num in number.map { String($0) } {
+        if (result.isEmpty) {
+            result += num
+        } else {
+            var top = String(result.last!).integer
+            let current = num.integer
+
+            while (k > 0 && top < current) {
+                result.removeLast()
                 k -= 1
-            } else {
-                break
+                if (result.isEmpty) { break }
+                top = String(result.last!).integer
             }
+            
+            result += num
         }
-        stack += number[i]
     }
-    while (stack.count > number.count - k) {
-        stack.removeLast()
+    result.removeLast(k)
+    return result
+}
+
+extension String {
+    var integer: Int {
+        return Int(self)!
     }
-    
-    return stack
 }
