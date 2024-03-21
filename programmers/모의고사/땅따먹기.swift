@@ -1,20 +1,22 @@
 import Foundation
 
 func solution(_ land:[[Int]]) -> Int{
-    var table = Array(repeating: Array(repeating: 0, count: 4), count: land.count)
+    var answer = 0
+    var table = land
     
-    for i in 0..<4 {
-        table[0][i] = land[0][i]
-    }
-    for i in 1..<land.count {
-        for j in 0..<4 {
-            for k in 0..<4 {
-                if (j == k) { continue }
-                var tableValue = table[i - 1][k]
-                table[i][j] = max(table[i][j], land[i][j] + tableValue)
+    for col in 1..<table.count {
+        for row in 0..<4 {
+            var maxVal = -1
+            
+            for i in 0..<4 {
+                if (i != row) {
+                    maxVal = max(maxVal, table[col - 1][i])
+                }
             }
+            
+            table[col][row] = land[col][row] + maxVal
         }
     }
-    
-    return table[land.count - 1].max()!
+
+    return table[table.count - 1].max()!
 }
