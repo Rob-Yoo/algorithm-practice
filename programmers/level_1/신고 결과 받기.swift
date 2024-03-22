@@ -1,46 +1,31 @@
 import Foundation
 
-var userReportDict = [String: Set<String>]()
-var reportedRecords = Array(repeating: 0, count: 1000)
-var userIdxDict = [String: Int]()
-var bannedIDList = Set<String>()
+var reportDict = [String: Set<String>]()
+var reportedDict = [String: Int]()
 
 func solution(_ id_list:[String], _ report:[String], _ k:Int) -> [Int] {
-    var result = Array(repeating: 0, count: id_list.count)
+    var result = [Int]()
+    var bannedIDs = [String]()
+    
+    parseReport(report)
+    bannedIDs = reportedDict.filter { $0.value >= k }.map { $0.key }
 
-    parseIDList(id_list)
-    parseReport(report, k)
-    for (key, value) in userReportDict {
-        let fromUserIdx = userIdxDict[key]!
+    for id in id_list {
+        let resultMailCount = bannedIDs.filter { reportDict[id, default: Set<String>()].contains($0) }.count
         
-        for bannedID in bannedIDList {
-            if (value.contains(bannedID)) {
-                result[fromUserIdx] += 1
-            }
-        }
+        result.append(resultMailCount)
     }
+    
     return result
 }
 
-func parseIDList(_ id_list:[String]) {
-    for (idx, id) in id_list.enumerated() {
-        userIdxDict[id] = idx
-    } 
-}
-
-func parseReport(_ reports:[String], _ k:Int) {
+func parseReport(_ reports:[String]) {
     for report in reports {
-        let log = report.components(separatedBy: " ")
-        let (from, to) = (log[0], log[1])
-        let toUserIdx = userIdxDict[to]!
-
-        if !(userReportDict[from, default: []].contains(to)) {
-            userReportDict[from, default: []].insert(to)
-            reportedRecords[toUserIdx] += 1
-            
-            if(reportedRecords[toUserIdx] >= k) {
-                bannedIDList.insert(to)
-            }
+        let report = report.components(separatedBy: " ")
+        let (from, to) = (report[0], report[1])
+        
+        if (reportDict[from, default: Set<String>()].insert(to).inserted) {
+            reportedDict[to, default: 0] += 1
         }
     }
 }
