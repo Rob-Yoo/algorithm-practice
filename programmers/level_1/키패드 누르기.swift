@@ -1,49 +1,59 @@
 import Foundation
 
-var keypad = [1: [0, 0], 2: [0, 1], 3: [0, 2], 4: [1, 0], 5: [1, 1], 6: [1, 2], 7: [2, 0], 8: [2, 1], 9: [2, 2], 0: [3, 1]]
-var leftHandPos = [3, 0]
-var rightHandPos = [3, 2]
+typealias Position = (x: Int, y: Int)
 
 func solution(_ numbers:[Int], _ hand:String) -> String {
+    let keyPad = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [-1, 0, -1]]
+    var keyPosDict = [Int: Position]()
+    
+    for i in 0..<keyPad.count {
+        for j in 0..<keyPad[i].count {
+            let num = keyPad[i][j]
+            
+            keyPosDict[num] = (x: j, y: i)
+        }
+    }
+    
+    return pushKeyPads(keyPosDict, numbers, hand)
+}
+
+func pushKeyPads(_ keyPosDict: [Int: Position], _ numbers: [Int], _ hand:String) -> String {
     var result = ""
+    var (leftPos, rightPos) = ((x: 0, y: 3), (x: 2, y: 3))
 
     for number in numbers {
-        if ([1, 4, 7].contains(number)) {
-            result += "L"
-            leftHandPos = keypad[number]!
-        } else if ([3, 6, 9].contains(number)) {
-            result += "R"
-            rightHandPos = keypad[number]!
+        let pos = keyPosDict[number]!
+        var isLeft: Bool
+
+        if (number == 1 || number == 4 || number == 7) {
+            isLeft = true
+        } else if (number == 3 || number == 6 || number == 9) {
+            isLeft = false
         } else {
-            result += decideWhichHand(number, hand)
+            let leftDistance = abs(leftPos.x - pos.x) + abs(leftPos.y - pos.y)
+            let rightDistance = abs(rightPos.x - pos.x) + abs(rightPos.y - pos.y)
+            
+            if (leftDistance > rightDistance) {
+                isLeft = false
+            } else if (leftDistance < rightDistance) {
+                isLeft = true
+            } else {
+                if (hand == "left") {
+                    isLeft = true
+                } else {
+                    isLeft = false
+                }
+            }
+        }
+        
+        if (isLeft) {
+            leftPos = pos
+            result += "L"   
+        } else {
+            rightPos = pos
+            result += "R"
         }
     }
     
     return result
-}
-
-func decideWhichHand(_ number: Int, _ hand: String) -> String {
-    let (numberX, numberY) = (keypad[number]![0], keypad[number]![1])
-    let (leftX, leftY) = (leftHandPos[0], leftHandPos[1])
-    let (rightX, rightY) = (rightHandPos[0], rightHandPos[1])
-    let leftHandDistance = abs(numberX - leftX) + abs(numberY - leftY)
-    let rightHandDistance = abs(numberX - rightX) + abs(numberY - rightY)
-    
-    if (leftHandDistance > rightHandDistance) {
-        rightHandPos = keypad[number]!
-        return "R"
-    } else if (leftHandDistance < rightHandDistance) {
-        leftHandPos = keypad[number]!
-        return "L"
-    } else {
-        if (hand == "right") {
-            rightHandPos = keypad[number]!
-            return "R"
-        } else {
-            leftHandPos = keypad[number]!
-            return "L"
-        }
-    }
-    
-    return ""
 }
