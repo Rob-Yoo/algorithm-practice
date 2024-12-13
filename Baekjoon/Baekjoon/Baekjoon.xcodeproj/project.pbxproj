@@ -10,6 +10,7 @@
 		CC01A3F42D0BF14000842120 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC01A3F32D0BF14000842120 /* main.swift */; };
 		CC01A3FB2D0BF8D800842120 /* 일곱난쟁이.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC01A3FA2D0BF8D800842120 /* 일곱난쟁이.swift */; };
 		CC01A3FD2D0BFC5D00842120 /* 알파벳 개수.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC01A3FC2D0BFC5D00842120 /* 알파벳 개수.swift */; };
+		CC01A4002D0C050600842120 /* 트럭주차.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC01A3FF2D0C050600842120 /* 트럭주차.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -29,6 +30,7 @@
 		CC01A3F32D0BF14000842120 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		CC01A3FA2D0BF8D800842120 /* 일곱난쟁이.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "일곱난쟁이.swift"; sourceTree = "<group>"; };
 		CC01A3FC2D0BFC5D00842120 /* 알파벳 개수.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "알파벳 개수.swift"; sourceTree = "<group>"; };
+		CC01A3FF2D0C050600842120 /* 트럭주차.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "트럭주차.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,11 +63,21 @@
 		CC01A3F22D0BF14000842120 /* Baekjoon */ = {
 			isa = PBXGroup;
 			children = (
+				CC01A3FE2D0C04B600842120 /* 1주차 - 재귀, 구현 */,
 				CC01A3F32D0BF14000842120 /* main.swift */,
-				CC01A3FA2D0BF8D800842120 /* 일곱난쟁이.swift */,
-				CC01A3FC2D0BFC5D00842120 /* 알파벳 개수.swift */,
 			);
 			path = Baekjoon;
+			sourceTree = "<group>";
+		};
+		CC01A3FE2D0C04B600842120 /* 1주차 - 재귀, 구현 */ = {
+			isa = PBXGroup;
+			children = (
+				CC01A3FA2D0BF8D800842120 /* 일곱난쟁이.swift */,
+				CC01A3FC2D0BFC5D00842120 /* 알파벳 개수.swift */,
+				CC01A3FF2D0C050600842120 /* 트럭주차.swift */,
+			);
+			name = "1주차 - 재귀, 구현";
+			path = "1주차 - 재귀, 구현";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -126,6 +138,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CC01A4002D0C050600842120 /* 트럭주차.swift in Sources */,
 				CC01A3F42D0BF14000842120 /* main.swift in Sources */,
 				CC01A3FD2D0BFC5D00842120 /* 알파벳 개수.swift in Sources */,
 				CC01A3FB2D0BF8D800842120 /* 일곱난쟁이.swift in Sources */,
